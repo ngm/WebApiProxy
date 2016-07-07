@@ -367,10 +367,13 @@ namespace <#= Configuration.Namespace#>.Clients
 		var postOrPutOrPatch =  method.Type.ToTitle() == "Post" || method.Type.ToTitle() == "Put" || method.Type.ToTitle() == "Patch";
 		var url = ("\"" + method.Url.Replace("{", "\" + ").Replace("}", " + \"") + "\"").Replace(" + \"\"","");
 		
-		allParameters.Where(m => m != null && (m.Type == "DateTime" || m.Type == "Nullable<DateTime>"))
+		allParameters.Where(m => m != null && m.Type == "DateTime")
 		             .ToList()
 		             .ForEach(p => url = url.Replace(" " + p.Name, " " + p.Name + ".ToString(\"o\")"));
 		             
+		allParameters.Where(m => m != null && m.Type == "Nullable<DateTime>")
+		             .ToList()
+		             .ForEach(p => url = url.Replace(" " + p.Name, " (" + p.Name + ".HasValue ? " + p.Name + ".Value.ToString(\"o\") : string.Empty)"));
 #>
 		/// <summary>
 		/// <#= method.Description.ToSummary() #>
